@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NOVA</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#060a12; --line:#0f2638; --line-br:#1b4463;
+  --cyan:#2de2e6; --cyan-dim:#15707f; --cyan-faint:#0a2e38;
+  --amber:#ffb454; --red:#ff6b6b; --text:#c8e6ea; --dim:#557d89;
+  --mono:'Share Tech Mono',monospace; --disp:'Rajdhani',sans-serif;
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  background:var(--bg); color:var(--text); font-family:var(--disp);
+  overflow:hidden; display:flex; flex-direction:column;
+  background-image:linear-gradient(var(--cyan-faint) 1px,transparent 1px),
+                   linear-gradient(90deg,var(--cyan-faint) 1px,transparent 1px);
+  background-size:52px 52px; background-position:center;
+  -webkit-font-smoothing:antialiased;
+  animation:pagein 1.2s var(--ease);
+}
+@keyframes pagein{from{opacity:0}to{opacity:1}}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:1;
+  background:radial-gradient(ellipse at 50% 45%,transparent 35%,rgba(6,10,18,.94) 100%)}
+
+/* header */
+header{display:flex;justify-content:space-between;align-items:flex-end;
+  padding:16px 30px 13px;border-bottom:1px solid var(--line);z-index:2}
+.wm{font-size:23px;font-weight:600;letter-spacing:.46em;color:var(--cyan);line-height:1}
+.wm small{display:block;font-size:10px;font-weight:300;letter-spacing:.22em;
+  color:var(--dim);margin-top:6px;text-transform:uppercase}
+#clock{font-family:var(--mono);font-size:21px;color:var(--cyan);line-height:1;text-align:right}
+#date{font-size:10px;color:var(--dim);letter-spacing:.22em;text-transform:uppercase;
+  text-align:right;margin-top:6px}
+
+/* layout */
+main{flex:1;display:grid;grid-template-columns:220px 1fr 330px;gap:22px;
+  padding:22px 30px 28px;min-height:0;z-index:2}
+.panel{border:1px solid var(--line);background:rgba(9,16,28,.5);padding:17px;
+  display:flex;flex-direction:column;gap:15px;min-height:0}
+.panel h2{font-size:10px;font-weight:600;letter-spacing:.34em;color:var(--dim);
+  text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:9px}
+.vital label{font-size:10px;letter-spacing:.22em;color:var(--dim);text-transform:uppercase}
+.vital .val{font-family:var(--mono);font-size:15px;color:var(--cyan);margin-top:2px}
+.bar{height:2px;background:var(--cyan-faint);margin-top:6px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--cyan);width:0;
+  transition:width 1.4s var(--ease)}
+
+/* reactor */
+.core-zone{display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:28px}
+.reactor{position:relative;width:300px;height:300px;
+  transition:transform 1s var(--ease)}
+.ring{position:absolute;inset:0;border-radius:50%;
+  transition:border-color .8s var(--ease),opacity .8s var(--ease)}
+.r1{border:1px dashed var(--cyan-dim);opacity:.55;animation:spin 46s linear infinite}
+.r2{inset:29px;border:1px solid var(--line-br);border-top:1.5px solid var(--cyan);
+  animation:spin 14s linear infinite}
+.r3{inset:58px;border:1px dotted var(--cyan-dim);opacity:.5;
+  animation:spin 26s linear infinite reverse}
+.r4{inset:89px;border:1.5px solid transparent;border-left-color:var(--cyan);
+  border-right-color:var(--cyan);opacity:.85;animation:spin 9s linear infinite}
+.core{position:absolute;inset:120px;border-radius:50%;
+  background:radial-gradient(circle,#d4feff 0%,var(--cyan) 38%,var(--cyan-dim) 72%,transparent 100%);
+  filter:drop-shadow(0 0 16px rgba(45,226,230,.55));
+  transition:filter .9s var(--ease);
+  animation:breathe 6s ease-in-out infinite}
+.halo{position:absolute;inset:-14px;border-radius:50%;opacity:0;
+  border:1px solid rgba(45,226,230,.35);
+  transition:opacity .8s var(--ease)}
+.tick{position:absolute;inset:8px;border-radius:50%;opacity:.45;
+  background:repeating-conic-gradient(from 0deg,var(--cyan-dim) 0 .5deg,transparent .5deg 7.5deg);
+  -webkit-mask:radial-gradient(circle,transparent 63%,#000 64%,#000 67%,transparent 68%);
+  mask:radial-gradient(circle,transparent 63%,#000 64%,#000 67%,transparent 68%);
+  animation:spin 90s linear infinite reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes breathe{0%,100%{transform:scale(1);opacity:.88}50%{transform:scale(1.035);opacity:1}}
+@keyframes halo{0%{transform:scale(.96);opacity:.5}100%{transform:scale(1.12);opacity:0}}
+
+body.idle .reactor{transform:scale(.97)}
+
+body.listening .reactor{transform:scale(1.04)}
+body.listening .r2{animation-duration:4s;border-top-color:#8ffcff}
+body.listening .r4{animation-duration:3s}
+body.listening .r1{opacity:.9}
+body.listening .halo{animation:halo 1.8s var(--ease) infinite}
+body.listening .core{animation-duration:2s;
+  filter:drop-shadow(0 0 34px rgba(45,226,230,.9))}
+
+body.thinking .r2,body.thinking .r4{border-top-color:var(--amber);
+  border-left-color:var(--amber);border-right-color:var(--amber)}
+body.thinking .r2{animation-duration:2.4s}
+body.thinking .r4{animation-duration:1.8s}
+body.thinking .core{background:radial-gradient(circle,#ffeed4 0%,var(--amber) 40%,#8a5a1a 76%,transparent 100%);
+  filter:drop-shadow(0 0 26px rgba(255,180,84,.75))}
+
+body.speaking .r4{animation-duration:4s}
+body.speaking .core{animation-duration:2.4s;
+  filter:drop-shadow(0 0 30px rgba(45,226,230,.8))}
+
+/* state label with animated dots */
+#state{font-size:14px;letter-spacing:.5em;text-transform:uppercase;color:var(--cyan);
+  transition:color .6s var(--ease),opacity .6s var(--ease);opacity:.85;
+  font-weight:500;padding-left:.5em}
+body.thinking #state{color:var(--amber)}
+body.idle #state{opacity:.45}
+#state::after{content:'';display:inline-block;width:1.6em;text-align:left;
+  letter-spacing:.12em}
+body.listening #state::after,body.thinking #state::after{
+  animation:dots 1.4s steps(4,end) infinite}
+@keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
+
+/* waveform */
+.wave{display:flex;gap:4px;height:22px;align-items:center;opacity:.14;
+  transition:opacity .6s var(--ease)}
+body.listening .wave,body.speaking .wave{opacity:1}
+.wave i{width:2px;height:3px;background:var(--cyan);border-radius:1px}
+body.listening .wave i,body.speaking .wave i{animation:wv 1.5s ease-in-out infinite}
+@keyframes wv{0%,100%{height:3px}50%{height:20px}}
+
+#hint{font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.06em;
+  transition:opacity .6s var(--ease)}
+body.listening #hint,body.thinking #hint,body.speaking #hint{opacity:.35}
+#hint b{color:var(--cyan);font-weight:400}
+
+/* conversation */
+#log{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:14px;
+  padding-right:4px;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+#log::-webkit-scrollbar{width:3px}
+#log::-webkit-scrollbar-thumb{background:var(--line-br)}
+.msg{font-size:14px;font-weight:300;line-height:1.55;border-left:1.5px solid var(--line-br);
+  padding-left:12px;animation:in .55s var(--ease)}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.msg .who{font-size:9px;letter-spacing:.32em;color:var(--dim);display:block;
+  text-transform:uppercase;margin-bottom:3px}
+.msg.nova{border-left-color:var(--cyan)}
+.msg.nova .who{color:var(--cyan)}
+.msg.tool{border-left-color:var(--amber);font-family:var(--mono);font-size:11px;color:var(--dim)}
+.msg.tool .who{color:var(--amber)}
+.msg.system{border-left-color:var(--line-br);font-family:var(--mono);font-size:11px;
+  color:var(--dim);opacity:.75}
+.msg.error{border-left-color:var(--red);color:var(--red);font-size:12px}
+.msg.error .who{color:var(--red)}
+#empty{color:var(--dim);font-size:12px;font-weight:300;opacity:.55;line-height:1.7}
+
+/* confirm modal */
+#overlay{position:fixed;inset:0;background:rgba(6,10,18,.75);z-index:10;
+  display:none;align-items:center;justify-content:center;
+  animation:in .3s var(--ease)}
+#overlay.show{display:flex}
+#modal{border:1px solid var(--cyan-dim);background:#0a1220;padding:26px 30px;
+  max-width:420px;box-shadow:0 0 40px rgba(45,226,230,.15)}
+#modal h3{font-size:10px;letter-spacing:.3em;color:var(--amber);
+  text-transform:uppercase;margin-bottom:14px}
+#modal p{font-size:14px;font-weight:300;line-height:1.6;margin-bottom:22px}
+#modal .row{display:flex;gap:12px}
+#modal button{flex:1;padding:11px;background:transparent;color:var(--text);
+  border:1px solid var(--line-br);font-family:var(--disp);font-size:13px;
+  letter-spacing:.15em;text-transform:uppercase;cursor:pointer;
+  transition:all .2s var(--ease)}
+#modal button.allow{border-color:var(--cyan);color:var(--cyan)}
+#modal button.allow:hover{background:rgba(45,226,230,.12)}
+#modal button.deny:hover{background:rgba(255,107,107,.1);border-color:var(--red);color:var(--red)}
+
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body class="idle">
+
+<header>
+  <div class="wm">NOVA<small>voice interface</small></div>
+  <div><div id="clock">--:--:--</div><div id="date">—</div></div>
+</header>
+
+<main>
+  <section class="panel">
+    <h2>System</h2>
+    <div class="vital"><label>CPU</label><div class="val" id="cpu">—</div><div class="bar"><i id="cpu-bar"></i></div></div>
+    <div class="vital"><label>Memory</label><div class="val" id="ram">—</div><div class="bar"><i id="ram-bar"></i></div></div>
+    <div class="vital"><label>Uptime</label><div class="val" id="uptime">00:00</div></div>
+    <div class="vital"><label>Speech model</label><div class="val" id="model">—</div></div>
+    <div class="vital"><label>Commands</label><div class="val" id="count">0</div></div>
+  </section>
+
+  <section class="core-zone">
+    <div class="reactor">
+      <div class="halo"></div>
+      <div class="tick"></div>
+      <div class="ring r1"></div><div class="ring r2"></div>
+      <div class="ring r3"></div><div class="ring r4"></div>
+      <div class="core"></div>
+    </div>
+    <div id="state">Standby</div>
+    <div class="wave" id="wave"></div>
+    <div id="hint">Hold <b id="hk">OPTION + SPACE</b> and speak · release to send</div>
+  </section>
+
+  <section class="panel">
+    <h2>Conversation</h2>
+    <div id="log"><div id="empty">Nothing yet.<br>Hold the keys, say something, and it'll appear here.</div></div>
+  </section>
+</main>
+
+<div id="overlay"><div id="modal">
+  <h3>Permission requested</h3>
+  <p id="modal-q"></p>
+  <div class="row">
+    <button class="deny" onclick="answerConfirm(false)">Deny</button>
+    <button class="allow" onclick="answerConfirm(true)">Allow</button>
+  </div>
+</div></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const wave=$('wave');
+for(let i=0;i<30;i++){const b=document.createElement('i');
+  b.style.animationDelay=(Math.random()*1.4).toFixed(2)+'s';wave.appendChild(b)}
+
+const LABEL={idle:'Standby',listening:'Listening',thinking:'Processing',speaking:'Responding'};
+let count=0,t0=Date.now();
+
+function setState(s){
+  document.body.className=s;
+  $('state').textContent=LABEL[s]||s;
+}
+function setHotkey(k){$('hk').textContent=k}
+
+function addMsg(who,text){
+  const e=$('empty'); if(e)e.remove();
+  if(who==='user'){count++;$('count').textContent=count}
+  const d=document.createElement('div');
+  d.className='msg '+who;
+  const label={user:'You',tool:'Skill',nova:'NOVA',system:'System',error:'Error'}[who]||who;
+  const s=document.createElement('span');s.className='who';s.textContent=label;
+  d.appendChild(s);d.appendChild(document.createTextNode(text));
+  $('log').appendChild(d);$('log').scrollTop=1e9;
+}
+function updateStats(s){
+  $('cpu').textContent=s.cpu+'%';$('cpu-bar').style.width=s.cpu+'%';
+  $('ram').textContent=s.ram+'%';$('ram-bar').style.width=s.ram+'%';
+  if(s.model)$('model').textContent=s.model;
+}
+setInterval(()=>{
+  const n=new Date();
+  $('clock').textContent=n.toLocaleTimeString('en-US',{hour12:false});
+  $('date').textContent=n.toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});
+  const u=Math.floor((Date.now()-t0)/1000);
+  $('uptime').textContent=String(Math.floor(u/60)).padStart(2,'0')+':'+String(u%60).padStart(2,'0');
+},1000);
+
+/* --- talk to the local NOVA server --- */
+let currentConfirmId=null;
+function answerConfirm(allow){
+  if(currentConfirmId==null)return;
+  fetch('/confirm',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({id:currentConfirmId,allow})});
+  $('overlay').classList.remove('show');
+  currentConfirmId=null;
+}
+async function poll(){
+  try{
+    const res=await fetch('/events');
+    const batch=await res.json();
+    for(const e of batch){
+      if(e.kind==='state')setState(e.payload);
+      else if(e.kind==='msg')addMsg(e.payload.who,e.payload.text);
+      else if(e.kind==='confirm'){
+        currentConfirmId=e.payload.id;
+        $('modal-q').textContent=e.payload.question;
+        $('overlay').classList.add('show');
+      }
+    }
+  }catch(err){/* server not ready yet, keep trying */}
+  setTimeout(poll,300);
+}
+async function pollStats(){
+  try{
+    const res=await fetch('/stats');
+    const s=await res.json();
+    updateStats(s);
+    if(s.hotkey)setHotkey(s.hotkey);
+  }catch(err){}
+  setTimeout(pollStats,2000);
+}
+poll();
+pollStats();
+</script>
+</body>
+</html>
